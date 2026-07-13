@@ -14,8 +14,8 @@ width = capture.get(cv2.CAP_PROP_FRAME_WIDTH)
 height = capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
 #set the width and height of the camera
-capture.set(3,640)
-capture.set(4,480)
+# capture.set(3,640)
+# capture.set(4,480)
 
 
 
@@ -33,10 +33,10 @@ while True :
     if not ret:
         print("End of video or Error.")
         break
-    results = model(frame, stream=True)
+    results = model.track(frame, persist = True)
     for r in results:
         frame = r.plot()
-        out.write(frame)
+        # out.write(frame)
         cv2.imshow('frame',frame)
     if cv2.waitKey(1) == ord('q'):
         break
