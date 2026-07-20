@@ -27,3 +27,16 @@ def lineCrossedUp(carPosition,the_line):
     else:
         return False
     
+
+
+def calculate_duration(traffic_density, queue_length, traffic_flow, min_time, max_time):
+    #traffic flow = number of vehicles passing in the other green light direction
+    #traffic density and queue length = number of vehicles in the waiting zone
+    
+    alpha = 0.5
+    beta = 0.3 
+    gamma = 0.2
+
+    score = alpha * traffic_density + beta * queue_length + gamma * traffic_flow
+    duration = min_time + (max_time - min_time) * score
+    return duration

@@ -6,7 +6,7 @@ from collections import defaultdict
 import trafficlib as tl
 
 # Load the YOLO model
-model = YOLO('yolo11m.pt')  # this is the small version '11small'
+model = YOLO('yolo11s.pt')  # this is the small version '11small'
 
 class_list = model.names   
 
@@ -39,7 +39,7 @@ while capture.isOpened():
     ret, frame = capture.read()
     if not ret:
         break
-    frame = cv2.resize(frame, (0,0), fx=0.5, fy=0.5)  # Resize the video to 640x480
+    frame = cv2.resize(frame, (0,0), fx=0.5, fy=0.5) 
     # Run YOLO tracking on the frame
     results = model.track(frame, persist=True, classes = [1,2,3,5,6,7]) 
     
@@ -53,7 +53,7 @@ while capture.isOpened():
         confidences = results[0].boxes.conf.cpu()
 
         
-        cv2.rectangle(frame, (SquareX1, SquareY1), (SquareX2, SquareY2), (0, 0, 255), 3)
+        cv2.rectangle(frame, (SquareX1, SquareY1), (SquareX2, SquareY2), (0, 0, 255), 3) #waiting zone
         cv2.line(frame, (100, LineY), (500, LineY), (0, 255, 0), 3)  # crossing line
 
 
