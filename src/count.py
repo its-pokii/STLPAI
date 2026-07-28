@@ -90,7 +90,7 @@ while capture.isOpened():
                 if class_counts[class_name] < 0:
                     class_counts[class_name] = 0  # Ensure count doesn't go negative
                 general_count = sum(class_counts.values())
-                print(f" general count: {general_count} | {class_name} count: {class_counts[class_name]}          ")
+                print(f" general count: {general_count} | {class_name} count: {class_counts[class_name]} ")
             if line_crossed and track_id not in crossed_ids:
                 crossed_ids.add(track_id)
                 total_crossed[class_name] += 1
