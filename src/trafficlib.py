@@ -1,6 +1,8 @@
 
 
 
+
+
 def check_car_zoneBox(carPosition,hUpperLine: int, hLowerLine: int, rVerticalLine: int, lVerticalLine: int):
     in_vertical_range = hUpperLine < carPosition[1] < hLowerLine
     in_horizontal_range = lVerticalLine < carPosition[0] < rVerticalLine
@@ -27,16 +29,21 @@ def lineCrossedUp(carPosition,the_line):
     else:
         return False
     
-
-
-def calculate_duration(traffic_density, queue_length, traffic_flow, min_time, max_time):
-    #traffic flow = number of vehicles passing in the other green light direction
-    #traffic density and queue length = number of vehicles in the waiting zone
     
-    alpha = 0.5
-    beta = 0.3 
-    gamma = 0.2
 
-    score = alpha * traffic_density + beta * queue_length + gamma * traffic_flow
-    duration = min_time + (max_time - min_time) * score
-    return duration
+def calculate_duration(queue_length, previous_green, vehicle_crossed, previous_estimated_discharge_rate):
+    max_green = 45
+    min_green = 10
+    alpha = 0.8 
+    messured_discharge_rate = vehicle_crossed / max(previous_green, 1)
+
+    if previous_estimated_discharge_rate is None or previous_estimated_discharge_rate == 0:
+        previous_estimated_discharge_rate = messured_discharge_rate
+    
+    estimated_discharge_rate = (alpha * previous_estimated_discharge_rate) + ((1 - alpha) * messured_discharge_rate)
+
+    green_time = min(max_green, max(min_green, (queue_length / estimated_discharge_rate)))
+
+    # return green_time, estimated_discharge_rate
+
+    return green_time, estimated_discharge_rate
