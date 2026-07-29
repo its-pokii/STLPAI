@@ -4,6 +4,40 @@ from collections import defaultdict
 import trafficlib as tl
 import pandas as pd
 import time
+import serial
+import threading
+
+
+
+# Arduino Setup ========================================================================
+arduino = serial.Serial(port='COM3', baudrate=9600, timeout=1)
+time.sleep(2)  # wait for Arduino reset
+
+def wait_for_ready():
+    while True:
+        line = arduino.readline().decode('utf-8', errors='ignore').strip()
+        if line == "READY":
+            break
+
+def send_and_wait(command):
+    """Send a command to Arduino and block until it replies DONE."""
+    arduino.write(f"{command}\n".encode('utf-8'))
+    print(f"Sent: {command}")
+    while True:
+        line = arduino.readline().decode('utf-8', errors='ignore').strip()
+        if line:
+            print("Arduino:", line)
+        if line == "DONE":
+            break
+
+wait_for_ready()
+
+
+
+
+redlight_duration=10
+
+#configuration =========================================================================
 
 file_path = "src\\trafficData.xlsx" 
 df = pd.read_excel(file_path)
@@ -14,12 +48,6 @@ class_list = model.names
 
 # Open the video file
 capture = cv2.VideoCapture('data/videos/video5.mp4')
-# height = capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
-# width = capture.get(cv2.CAP_PROP_FRAME_WIDTH)
-# print(f"Video height: {height}")
-# print(f"Video width: {width}")
-
-
 
 #waiting zone position points:
 SquareX2 = 180 #left Vertical line 
@@ -30,12 +58,16 @@ SquareY2 = 500  #lower Horizontal line
 LineY = 520  # crossing line
 
 
+
+
 def greenlight(duration_seconds):
     total_crossed_count = 0
     total_crossed = defaultdict(int)
     crossed_ids = set()
     capture = cv2.VideoCapture('data/videos/video5.mp4')
 
+    arduino_thread = threading.Thread(target=send_and_wait, args=(f"G{int(duration_seconds)}",))
+    arduino_thread.start()
     start_time = time.time()
 
     while capture.isOpened():
@@ -90,16 +122,27 @@ def greenlight(duration_seconds):
     # Release resources
     capture.release()
     cv2.destroyAllWindows()
+    arduino_thread.join()
 
     return total_crossed_count
 
 
-def redlight():
+def redlight(redlight_duration):
     general_count = 0
     class_counts = defaultdict(int)
     waiting_zone_ids = set()
     capture = cv2.VideoCapture('data/videos/video5.mp4')
+    start_time = time.time()
+
+    arduino_thread = threading.Thread(target=send_and_wait, args=(f"R{int(redlight_duration)}",))
+    arduino_thread.start()
+    
+
     while capture.isOpened():
+        elapsed = time.time() - start_time
+        if elapsed >= redlight_duration:
+            print(f"Time limit of {redlight_duration}s reached.")
+            break
         ret, frame = capture.read()
         if not ret:
             break
@@ -174,7 +217,7 @@ def redlight():
 
 
 
-queue_length = redlight()
+queue_length = redlight(redlight_duration)  # Measure the queue length during red light
 previous_green = df["Green Duration"].iloc[-1]
 vehicle_crossed = df["Vehicles Crossed"].iloc[-1]
 previous_estimated_discharge_rate = df["Estimated Discharge Rate"].iloc[-1]
