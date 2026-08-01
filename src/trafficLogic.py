@@ -20,7 +20,7 @@ def wait_for_ready():
             break
 
 def send_and_wait(command):
-    """Send a command to Arduino and block until it replies DONE."""
+    
     arduino.write(f"{command}\n".encode('utf-8'))
     print(f"Sent: {command}")
     while True:
@@ -58,7 +58,7 @@ SquareY2 = 500  #lower Horizontal line
 LineY = 520  # crossing line
 
 
-
+#===========================================================
 
 def greenlight(duration_seconds):
     total_crossed_count = 0
@@ -126,6 +126,8 @@ def greenlight(duration_seconds):
 
     return total_crossed_count
 
+
+#===========================================================
 
 def redlight(redlight_duration):
     general_count = 0
