@@ -111,7 +111,7 @@ while capture.isOpened():
     cv2.imshow("YOLO Object Tracking & Counting", frame)    
     
     # Exit loop if 'q' key is pressed
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(0) & 0xFF == ord('q'):
         break
 
 # Release resources

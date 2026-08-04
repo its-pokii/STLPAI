@@ -28,8 +28,6 @@ def lineCrossedUp(carPosition,the_line):
         return True
     else:
         return False
-    
-    
 
 def calculate_duration(queue_length, previous_green, vehicle_crossed, previous_estimated_discharge_rate):
     max_green = 45
